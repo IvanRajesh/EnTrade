@@ -1,0 +1,59 @@
+# ─────────────────────────────────────────────────────────
+# ExitWave — systemd service unit
+# ─────────────────────────────────────────────────────────
+# Install:
+#   sudo cp deploy/exitwave.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable exitwave
+#   sudo systemctl start exitwave
+#
+# Logs:
+#   journalctl -u exitwave -f
+#   or check: /opt/exitwave/logs/
+# ─────────────────────────────────────────────────────────
+
+[Unit]
+Description=ExitWave — Automated F&O Position Exit System
+Documentation=https://github.com/your-repo/exitwave
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# Run as a dedicated non-root user
+User=exitwave
+Group=exitwave
+
+# Working directory where .env and logs/ reside
+WorkingDirectory=/opt/exitwave
+
+# The main command — adjust --max-loss as needed
+# Auth token must be pre-populated in .env (use --manual-login interactively first)
+ExecStart=/opt/exitwave/venv/bin/python -m exitwave --max-loss 5000
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+
+# Restart policy — restart on failure but not on clean exit (market close)
+Restart=on-failure
+RestartSec=30
+
+# Logging — stdout/stderr go to journald
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=exitwave
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/exitwave/logs /opt/exitwave/.env
+PrivateTmp=true
+
+# Resource limits
+LimitNOFILE=1024
+MemoryMax=256M
+
+[Install]
+WantedBy=multi-user.target

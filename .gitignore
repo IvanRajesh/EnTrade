@@ -1,0 +1,31 @@
+# Environment
+.env
+*.pyc
+__pycache__/
+*.pyo
+
+# Logs
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Distribution
+dist/
+build/
+*.egg-info/
+
+# Token cache
+.access_token
